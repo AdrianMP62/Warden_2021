@@ -14,7 +14,7 @@ Git repository https://github.com/AdrianMP62/Warden-2019
 
 RStudio: Version 1.1.463 – © 2009-2018 RStudio, Inc. R version: `r getRversion()`  
 Date and time: `r Sys.time()`
-
+xx
 Uses the following datafiles:  
 *  Warden_Gore_by_suite_06_20.csv (System,	SurveyType,	SiteName,	SiteCode,	Subsite	Date,	CommonName,	SpeciesCode,	Count) (e.g. Warden,	aerial,	Neridup Suite,	WRP001,	combined,	11/10/2006,	Great Egret,	greg,	1). Note some double counts for Oct 2006 and Feb 2015 removed.
 *  Average depths.csv (average depths, rainfall variables and pipeline operation and timing of surveys of Warden wetlands for each survey period).
