@@ -38,15 +38,13 @@ set.seed(1234)
 ```
 
 ```{r}
-Packages <- c("gridExtra","vegan", "tidyr", "ggrepel","ggplot2", "dplyr", "plyr", "scales", "ggpubr", "stringr","reshape2", "knitr", "zoo", "car","reshape2","readxl","lubridate")
+Packages <- c("gridExtra","openxlsx","vegan", "tidyr", "ggrepel","ggplot2", "dplyr", "plyr", "scales", "ggpubr", "stringr","reshape2", "knitr", "zoo", "car","reshape2","readxl","lubridate")
 lapply(Packages, library, character.only = TRUE)
 source("./functions/bio_env_ext.R") #The Bio_env and bv_step_ext routines below comes from http://menugget.blogspot.com.au/2011/06/clarke-and-ainsworths-bioenv-and-bvstep.html
 source("./functions/bv_step_ext.R")
 source("./functions/bv.step.R")
 source("./functions/extract_legend.R")
 ```
-
-
 
 #Analyses of waterbird data from the Warden and Gore Ramsar wetlands 2006 to 2019
   
@@ -347,11 +345,13 @@ plot(raincheck$ESPE, -38.914+(11.19*sqrt(raincheck$MYRU)))
 
 ###Load depth data and convert to AHD
 ```{r}
-Wdepths <- read_xlsx("./raw_data/Warden depths.xlsx") #note: all values of "dry", "pooling" and "below DG" counted as zero depth. Missing values retained.
+Wdepths <- read.csv("./raw_data/Warden depths.csv") #note: all values of "dry", "pooling" and "below DG" counted as zero depth. Missing values retained.
 Wdepths[, c(2:7)] <- round(Wdepths[, c(2:7)], digits = 2)
 # create year and month variables
-Wdepths$month <- month(as.POSIXlt(Wdepths$Date, format="%d/%m/%Y"))
-Wdepths$year <- year(as.POSIXlt(Wdepths$Date, format="%d/%m/%Y"))
+str(Wdepths)
+Wdepths$Date <- as.Date(Wdepths$Date, origin = "1899-12-30")
+Wdepths$month <- month(Wdepths$Date)
+Wdepths$year <- as.factor(year(Wdepths$Date))
 Wdepths$year <- as.factor(Wdepths$year)
 Wdepths$doy <- as.numeric(strftime(Wdepths$Date, format = "%j")) #create day of year variable
 ```
@@ -363,8 +363,8 @@ Wdepths_Ewans <- na.omit(Wdepths_Ewans) #remove NAs
 #graph data)
 ggplot(Wdepths_Ewans, aes(x=doy, y=Ewans, color=year)) + 
   geom_line() +
-  geom_point() +
-  scale_color_manual(values=c('grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','green','grey','grey',"grey",'grey','blue','red')) +
+  geom_point(cex=4) +
+  scale_color_manual(values=c('grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','green','grey','grey',"grey",'grey','orange','blue','red')) +
     ggtitle("Ewans annual depths") +
     theme(plot.title = element_text(vjust = -10)) +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -379,8 +379,8 @@ Wdepths_Wheat <- na.omit(Wdepths_Wheat) #remove NAs
 #graph data)
 ggplot(Wdepths_Wheat, aes(x=doy, y=Wheatfield, color=year)) + 
   geom_line() +
-  geom_point() +
-  scale_color_manual(values=c('grey','grey',"grey",'grey','grey','grey','grey','grey','grey','blue','grey','grey','grey','grey','grey',"grey",'grey','grey','red')) +
+  geom_point(cex = 4) +
+  scale_color_manual(values=c('grey','grey',"grey",'grey','grey','grey','grey','grey','grey','green','grey','grey','grey','grey','grey',"grey",'grey','grey','blue','red')) +
     ggtitle("Wheatfield annual depths") +
     theme(plot.title = element_text(vjust = -10)) +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -395,8 +395,8 @@ Wdepths_Ward <- na.omit(Wdepths_Ward) #remove NAs
 #graph data)
 ggplot(Wdepths_Ward, aes(x=doy, y=Warden, color=year)) + 
   geom_line() +
-  geom_point() +
-  scale_color_manual(values=c('grey','grey',"grey",'grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','blue','grey',"grey",'grey','grey','red')) +
+  geom_point(cex = 4) +
+  scale_color_manual(values=c('grey','grey',"grey",'grey','grey','grey','grey','grey','grey','grey','grey','grey','grey','blue','grey',"grey",'grey','grey','blue','red')) +
     ggtitle("Warden annual depths") +
     theme(plot.title = element_text(vjust = -10)) +
     theme(plot.title = element_text(hjust = 0.5)) +
@@ -476,10 +476,15 @@ Warden_SxY
 write.csv(Warden_SxY, "./outputs/Warden_SxY.csv")
 ```
 
-
-
-
-
+###Totals of species abundances x year (for summer)
+```{r}
+Warden <- input.data[input.data$System == "Warden", ]
+Warden <- Warden[Warden$Season == "spring", ]
+Warden$Year <- year(Warden$Date)
+Warden_SxY <- as.matrix(xtabs(Warden$Count ~ Warden$CommonName + Warden$Year))
+Warden_SxY
+write.csv(Warden_SxY, "./outputs/Warden_SxY_spr.csv")
+```
 
 ###Ordinations and associated analyses
 
