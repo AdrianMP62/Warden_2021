@@ -75,7 +75,7 @@ Taxonomy <- read.csv("./raw_data/Taxonomy.csv")
 ```
 
 
-###Totals of species x year for Warden+gore
+###Totals of species x year for Warden+Gore
 ```{r}
 input.data.2$Year <- year(input.data.2$Date)
 WG_SxY <- as.matrix(xtabs(input.data.2$Count ~ input.data.2$CommonName + input.data.2$Year))
@@ -930,14 +930,23 @@ write.csv(sp.selected, file = sp.id)
 
 ##GORE SYSTEM ANALYSIS ONLY 
 
-###Totals of species abundances x year (for spring)
+###Totals of species abundances x year
 ```{r}
-Gore_SxY <- input.data[input.data$System == "Gore", ]
-Gore_SxY <- Gore_SxY[Gore_SxY$Season == "spring", ]
-Gore_SxY$Year <- year(Gore_SxY$Date)
-Gore_SxY <- as.matrix(xtabs(Gore_SxY$Count ~ Gore_SxY$CommonName + Gore_SxY$Year))
+#spring
+Gore_SxY.spr <- input.data[input.data$System == "Gore", ]
+Gore_SxY.spr <- Gore_SxY.spr[Gore_SxY.spr$Season == "spring", ]
+Gore_SxY.spr$Year <- year(Gore_SxY.spr$Date)
+Gore_SxY.spr <- as.matrix(xtabs(Gore_SxY.spr$Count ~ Gore_SxY.spr$CommonName + Gore_SxY.spr$Year))
 Gore_SxY
-write.csv(Gore_SxY, "./outputs/Gore_SxY.csv")
+write.csv(Gore_SxY.spr, "./outputs/Gore_SxY.spr.csv")
+
+#summer
+Gore_SxY.sum <- input.data[input.data$System == "Gore", ]
+Gore_SxY.sum <- Gore_SxY.sum[Gore_SxY.sum$Season == "summer", ]
+Gore_SxY.sum$Year <- year(Gore_SxY.sum$Date)
+Gore_SxY.sum <- as.matrix(xtabs(Gore_SxY.sum$Count ~ Gore_SxY.sum$CommonName + Gore_SxY.sum$Year))
+Gore_SxY
+write.csv(Gore_SxY.sum, "./outputs/Gore_SxY.sum.csv")
 ```
 
 
@@ -1152,12 +1161,12 @@ Gore.stack.agg$SurvOrd <- as.numeric(str_replace_all(Gore.stack.agg$SurvOrd, c("
 ```{r}
 Gore.stack.spr <- Gore.stack.agg[Gore.stack.agg$Season=="spring", ] #cut down to just spring data
 Gore.stack.spr <- Gore.stack.spr[ order(Gore.stack.spr$SurvOrd), ]
-ggplot(Gore.stack.spr, aes(x=reorder(Survey, SurvOrd), y=Count, fill=Group)) + geom_bar(stat="identity", colour = "black") + scale_y_continuous(breaks = seq(0,25000, by=2500), limits=c(0,25000)) + labs(x="Survey", y="Abundance") + theme (axis.text.x=element_text(angle=90)) + theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0))) + scale_fill_manual(values = c("#CD9B9B","#912CEE","#104E8B","#698B22","#00EEEE","#FFA500","#FFE1FF","#B4CDCD","#C1FFc1","#A52A2A"))
+ggplot(Gore.stack.spr, aes(x=reorder(Survey, SurvOrd), y=Count, fill=Group)) + geom_bar(stat="identity", colour = "black") + scale_y_continuous(breaks = seq(0,25000, by=2500), limits=c(0,22500)) + labs(x="Survey", y="Abundance") + theme (axis.text.x=element_text(angle=90)) + theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0))) + scale_fill_manual(values = c("#CD9B9B","#912CEE","#104E8B","#698B22","#00EEEE","#FFA500","#FFE1FF","#B4CDCD","#C1FFc1","#A52A2A"))
 
 #summer
 Gore.stack.sum <- Gore.stack.agg[Gore.stack.agg$Season=="summer", ] #cut down to just summer data
 Gore.stack.sum <- Gore.stack.sum[ order(Gore.stack.sum$SurvOrd), ]
-ggplot(Gore.stack.sum, aes(x=reorder(Survey, SurvOrd), y=Count, fill=Group)) + geom_bar(stat="identity", colour = "black") + scale_y_continuous(breaks = seq(0,25000, by=2500), limits=c(0,25000)) + labs(x="Survey", y="Abundance") + theme (axis.text.x=element_text(angle=90)) + theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0))) + scale_fill_manual(values = c("#CD9B9B","#912CEE","#104E8B","#698B22","#00EEEE","#A2B5CD","#FFA500","#FFE1FF","#B4CDCD","#C1FFc1","#A52A2A")) #uses Date to reorder survey on x axis
+ggplot(Gore.stack.sum, aes(x=reorder(Survey, SurvOrd), y=Count, fill=Group)) + geom_bar(stat="identity", colour = "black") + scale_y_continuous(breaks = seq(0,25000, by=2500), limits=c(0,22500)) + labs(x="Survey", y="Abundance") + theme (axis.text.x=element_text(angle=90)) + theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(margin = margin(t = 20, r = 0, b = 0, l = 0))) + scale_fill_manual(values = c("#CD9B9B","#912CEE","#104E8B","#698B22","#00EEEE","#A2B5CD","#FFA500","#FFE1FF","#B4CDCD","#C1FFc1","#A52A2A")) #uses Date to reorder survey on x axis
 ```
 
 ###Stacked column plots for species richness at Gore
