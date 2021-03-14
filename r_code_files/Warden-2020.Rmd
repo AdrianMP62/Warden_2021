@@ -83,14 +83,15 @@ write.csv(WG_SxY, "./outputs/WG_SxY.csv")
 ```
 
 ##MULTI-VARIATE ANALYSIS OF WARDEN AND GORE DATA COMBINED, BY SEASON 
-
 ```{r}
 WG.bySeason <- input.data.2
+WG.bySeason = filter(WG.bySeason, Survey != "Oct-2006" & Survey != "Oct-2007" & Survey != "Nov-2008" & Survey != "Feb-2008")
 ```
 
 ###Aggregate data by Season and create matrix
 ```{r}
   WG.bySeason.agg <- aggregate(data=WG.bySeason, Count ~ CommonName + Survey + Season, FUN="sum") #sum data by common name and survey period
+# WG.bySeason.agg$Count <- sqrt(WG.bySeason.agg$Count)
 ```
 
 #### Create matrix for ordination
@@ -100,7 +101,7 @@ rownames(WG.bySeason.m) <- WG.bySeason.m[,1]
   WG.bySeason.m[,1] <- NULL
   WG.bySeason.m[is.na(WG.bySeason.m)] <- 0
    WG.bySeason.m [,1] <- NULL #remove season column
-  WG.bySeason.m[, 1-75] <- sqrt(WG.bySeason.m[, 1-75])
+  #WG.bySeason.m[, 1-75] <- sqrt(WG.bySeason.m[, 1-75])
 ```
 
 
@@ -149,9 +150,9 @@ WG.3dMDS.bySeas <- metaMDS(WG.bySeason.m, distance = "bray", k=3)
 ```{r}
 Xmin <- min(WG.3dMDS.bySeas.pts$MDS1)*1.3
 Xmax <- max(WG.3dMDS.bySeas.pts$MDS1)*1.3
-Ymin <- min(WG.3dMDS.bySeas.pts$MDS2)*1.3
-Ymax <- max(WG.3dMDS.bySeas.pts$MDS2)*1.3
-ggplot(WG.3dMDS.bySeas.pts, aes(x=MDS1, y=MDS2)) + xlim(Xmin, Xmax) + ylim(Ymin, Ymax) + geom_point(aes(colour=Season), size=5) + coord_fixed(ratio = 1) + geom_text(aes(label=Survey), size=3, vjust=1, hjust=1.3) + theme (plot.margin=unit(c(0,0,0,5),"mm"))
+Ymin <- min(WG.3dMDS.bySeas.pts$MDS3)*1.3
+Ymax <- max(WG.3dMDS.bySeas.pts$MDS3)*1.3
+ggplot(WG.3dMDS.bySeas.pts, aes(x=MDS1, y=MDS3)) + xlim(Xmin, Xmax) + ylim(Ymin, Ymax) + geom_point(aes(colour=Season), size=5) + coord_fixed(ratio = 1) + geom_text(aes(label=Survey), size=3, vjust=1, hjust=1.3) + theme (plot.margin=unit(c(0,0,0,5),"mm"))
 ```
 
 ####A 'Simper' analysis to extract a short-list of species most responsible for the differences between seasons
@@ -197,6 +198,7 @@ These box plots show the abundance of the top 8 species contributiong to waterbi
 
 ```{r}
 WG.bySystem <- input.data.2
+WG.bySystem = filter(WG.bySystem, Survey != "Oct-2006" & Survey != "Oct-2007" & Survey != "Nov-2008" & Survey != "Feb-2008")
 ```
 
 #### Aggregate data by species and system/survey
@@ -210,7 +212,7 @@ WG.bySystem.m <- spread(WG.bySystem.agg, CommonName, Count)
 rownames(WG.bySystem.m) <- WG.bySystem.m[,1]
   WG.bySystem.m[,1] <- NULL
   WG.bySystem.m[is.na(WG.bySystem.m)] <- 0
-  WG.bySystem.m[, 1-75] <- sqrt(WG.bySystem.m[, 1-75])
+  #WG.bySystem.m[, 1-75] <- sqrt(WG.bySystem.m[, 1-75])
 ```
 
 #### MDS unconstrained ordination using metaMDS in package vegan to compare Warden and Gore wetland systems
@@ -257,7 +259,6 @@ WG.3dMDS.bySyst.pts$System <- gsub("Ward", "Warden", WG.3dMDS.bySyst.pts$System)
 WG.3dMDS.bySyst.pts$Season <-  substr(WG.3dMDS.bySyst.pts$Survey, 1, 3) #extract months
 WG.3dMDS.bySyst.pts$Season <- recode(WG.3dMDS.bySyst.pts$Season, "'Feb'='summer';c('Dec','Oct','Nov')='spring'") #convert months to season
 WG.3dMDS.bySyst.pts$SystSeas <- paste(WG.3dMDS.bySyst.pts$System, WG.3dMDS.bySyst.pts$Season, sep=" in ")
-str(WG.3dMDS.bySyst.pts) #join System and season
 ```
 
 ### plot of 3D Warden vs Gore by season ordination
@@ -1034,15 +1035,15 @@ stressplot(Gore.spr.MDS)
 ####Extract ordination point data for ggplots for metaMDS
 Note - need to ensure the right ordination has been run (above), i.e. sqrt or raw count data
 ```{r}
-#summer #sqrt only
-Gore.sum.MDS.sqrt.pts <- as.data.frame(Gore.sum.MDS.sqrt$points) #extract coordinates from ordination
-Gore.sum.MDS.sqrt.pts$Label2 <- row.names(Gore.sum.MDS.sqrt.pts) #add survey name from row names and call variable Label2 so that species names can be added later
-Gore.sum.MDS.sqrt.pts$Label2 <- as.yearmon(Gore.sum.MDS.sqrt.pts$Label, "%b-%Y") #convert label to date format using package zoo
-Gore.sum.MDS.sqrt.pts <- Gore.sum.MDS.sqrt.pts[order(as.Date(Gore.sum.MDS.sqrt.pts$Label2, format="%b-%Y")),] #order by Survey date
-Gore.sum.MDS.sqrt.pts$Label <- as.character(Gore.sum.MDS.sqrt.pts$Label2) #convert Survey to character name and create new variable 'Label'
-Gore.sum.MDS.sqrt.pts$Type <- "Survey" #add data type (survey here and species later)
-Gore.sum.MDS.sqrt.pts$Label2 <- NULL 
-Gore.sum.MDS.sqrt.spscores <- as.data.frame(scores(Gore.sum.MDS, display = "species")) #extract species scores for later restricting to bio-bio (bv.step) outcome
+#summer
+Gore.sum.MDS.pts <- as.data.frame(Gore.sum.MDS$points) #extract coordinates from ordination
+Gore.sum.MDS.pts$Label2 <- row.names(Gore.sum.MDS.pts) #add survey name from row names and call variable Label2 so that species names can be added later
+Gore.sum.MDS.pts$Label2 <- as.yearmon(Gore.sum.MDS.pts$Label, "%b-%Y") #convert label to date format using package zoo
+Gore.sum.MDS.pts <- Gore.sum.MDS.pts[order(as.Date(Gore.sum.MDS.pts$Label2, format="%b-%Y")),] #order by Survey date
+Gore.sum.MDS.pts$Label <- as.character(Gore.sum.MDS.pts$Label2) #convert Survey to character name and create new variable 'Label'
+Gore.sum.MDS.pts$Type <- "Survey" #add data type (survey here and species later)
+Gore.sum.MDS.pts$Label2 <- NULL 
+Gore.sum.MDS.spscores <- as.data.frame(scores(Gore.sum.MDS, display = "species")) #extract species scores for later restricting to bio-bio (bv.step) outcome
 
 #spring - raw counts
 Gore.spr.MDS.pts <- as.data.frame(Gore.spr.MDS$points) #extract coordinates from ordination
@@ -1068,12 +1069,12 @@ Gore.spr.MDS.sqrt.spscores <- as.data.frame(scores(Gore.spr.MDS, display = "spec
 
 ####Ordination graphs of Gore system waterbird communities by survey with surveys undertaken in spring and summer
 ```{r}
-#summer sqrt data
-xmin <- min(Gore.sum.MDS.sqrt.pts$MDS1)*1.3
-xmax <- max(Gore.sum.MDS.sqrt.pts$MDS1)*1.3
-ymin <- min(Gore.sum.MDS.sqrt.pts$MDS2)*1.3
-ymax <- max(Gore.sum.MDS.sqrt.pts$MDS2)*1.3
-ggplot(Gore.sum.MDS.sqrt.pts, aes(x=MDS1, y=MDS2)) + xlim(xmin, xmax) + ylim(ymin, ymax) + coord_fixed(ratio = 1) + geom_point(cex=8) + geom_text(aes(label = Label), cex=3, vjust=2, hjust=1.6) + theme(legend.position = "none") + geom_path()
+#summer raw count data
+xmin <- min(Gore.sum.MDS.pts$MDS1)*1.3
+xmax <- max(Gore.sum.MDS.pts$MDS1)*1.3
+ymin <- min(Gore.sum.MDS.pts$MDS2)*1.3
+ymax <- max(Gore.sum.MDS.pts$MDS2)*1.3
+ggplot(Gore.sum.MDS.pts, aes(x=MDS1, y=MDS2)) + xlim(xmin, xmax) + ylim(ymin, ymax) + coord_fixed(ratio = 1) + geom_point(cex=8) + geom_text(aes(label = Label), cex=3, vjust=2, hjust=1.6) + theme(legend.position = "none")
 
 #spring raw count data
 Gore.spr.MDS.pts.2 <- Gore.spr.MDS.pts
@@ -1102,7 +1103,7 @@ ggplot(Gore.spr.MDS.sqrt.pts, aes(x=MDS1, y=MDS2)) + xlim(xmin, xmax) + ylim(ymi
 
 #### Bio-bio analysis of spring waterbird species (raw count data)
 ```{r}
-# use bv.stepo to undertake bio-bio analysis and extract ordination coordinates for the 4 species
+# use bv.step to undertake bio-bio analysis and extract ordination coordinates for the 4 species
 Gore.spr.bio <- bv.step(Gore.spr.m, Gore.spr.m, scale.fix=FALSE, scale.var=FALSE, fix.dist.method = "bray", var.dist.method = "bray", max.rho=0.95, min.delta.rho=0.01, output.best=10, num.restarts = 100)
 #note: warnings are not important, see http://menugget.blogspot.com/2011/06/clarke-and-ainsworths-bioenv-and-bvstep.html
 Gore.spr.bio
@@ -1221,11 +1222,5 @@ ground.data.W <- as.data.frame(t(ground.data.W))
 ground.data.W$SSD <- row.names(ground.data.W)
 ground.data.W$Site <- substr(ground.data.W$SSD, start=1, stop=6)
 ```
-
-```{r}
-Taxonomy <- read.csv("./raw_data/Taxonomy.csv")
-```
-
-
 
 
