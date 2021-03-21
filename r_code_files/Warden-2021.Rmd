@@ -11,9 +11,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-
-
-
 Git repository https://github.com/AdrianMP62/Warden-2019  
 
 RStudio: Version 1.1.463 – © 2009-2018 RStudio, Inc. R version: `r getRversion()`  
