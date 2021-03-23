@@ -929,6 +929,9 @@ Warden.stack.rich.sum <- Warden.stack.rich.sum[ order(Warden.stack.rich.sum$Surv
 ggplot(Warden.stack.rich.sum, aes(x=reorder(Survey, SurvOrd), y=freq, fill=Group)) + geom_bar(stat="identity", colour = "black") + scale_y_continuous(breaks = seq(0,50, by=10), limits=c(0,50)) + labs(x="Survey", y="Number of species") + theme (axis.text.x=element_text(angle=90)) + theme(axis.title.y = element_text(size=20, margin = margin(t = 0, r = 20, b = 0, l = 0))) + theme(axis.title.x = element_text(size = 20, margin = margin(t = 20, r = 0, b = 0, l = 0))) + theme(axis.text.x = element_text(size=12)) + theme(axis.text.y = element_text(size=15))+ scale_fill_manual(values = c("#CD9B9B","#912CEE","#104E8B","#698B22","#00EEEE","#A2B5CD","#FFA500","#FFE1FF","#B4CDCD","#C1FFc1","#A52A2A"))
 ```
 
+
+
+
 ### Esperance rainfall for Warden wetlands
 ```{r}
 rainfall <- read.csv("./raw_data/multi station CDM.csv")
